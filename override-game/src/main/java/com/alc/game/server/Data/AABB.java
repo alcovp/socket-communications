@@ -1,11 +1,9 @@
-package com.alc.game.common.Data;
-
-import com.alc.game.server.Data.IColliding;
+package com.alc.game.server.Data;
 
 /**
  * Created by alc on 29.07.2015.
  */
-public class AABB implements IColliding {
+public class AABB {
     public double x1;
     public double x2;
     public double y1;
@@ -33,10 +31,5 @@ public class AABB implements IColliding {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public XYZ cutDistance(XYZ objectBounds, XYZ startPoint, XYZ translationVector) {
-        return null;
     }
 }

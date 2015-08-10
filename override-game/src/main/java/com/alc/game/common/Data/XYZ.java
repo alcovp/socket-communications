@@ -130,4 +130,30 @@ public class XYZ {
         NumberFormat formatter = new DecimalFormat("#0.000");
         return formatter.format(x) + ", " + formatter.format(y) + ", " + formatter.format(z);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        XYZ xyz = (XYZ) o;
+
+        if (Double.compare(xyz.x, x) != 0) return false;
+        if (Double.compare(xyz.y, y) != 0) return false;
+        return Double.compare(xyz.z, z) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(x);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(y);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(z);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

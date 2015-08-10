@@ -1,18 +1,17 @@
 package com.alc.game.server.Data;
 
-import com.alc.game.common.Data.AABB;
 import com.alc.game.common.Data.XYZ;
 
 /**
  * Created by alc on 21.03.2015.
  */
-public class Player {
+public class Player implements IPhysical {
 
-    private XYZ position = new XYZ(5, 50, 5);
+    private XYZ position = new XYZ(1, 10, 1);
     private XYZ velocity = new XYZ(0, 0, 0);
     private XYZ viewDirection = new XYZ(1, 0, 0);
     private XYZ size = new XYZ(0.5, 1.8, 0.5);
-    private double runSpeed = 5;
+    private double runSpeed = 2;
     private double jumpStartSpeed = 5;
     private boolean jumping = false;
     private boolean movingForward = false;
@@ -20,7 +19,7 @@ public class Player {
     private boolean movingRight = false;
     private boolean movingLeft = false;
 
-    public IColliding getBounds() {
+    public AABB getBounds() {
         return new AABB(
                 position.x - size.x / 2,
                 position.x + size.x / 2,

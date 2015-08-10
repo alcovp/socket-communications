@@ -1,33 +1,30 @@
 package com.alc.game.server.Data;
 
-import com.alc.game.common.Data.AABB;
+import java.util.List;
 
 /**
  * Created by alc on 29.07.2015.
  */
-public class World {
-    private WorldBounds bounds;
-    private Physics physics;
+public class World implements IPhysical {
+    private final AABB bounds;
+    private final Physics physics;
+    private final List<IPhysical> physicalObjects;
 
-    public World(WorldBounds bounds, Physics physics) {
+    public World(AABB bounds, Physics physics, List<IPhysical> physicalObjects) {
         this.bounds = bounds;
         this.physics = physics;
+        this.physicalObjects = physicalObjects;
     }
 
-
-    public WorldBounds getBounds() {
+    public AABB getBounds() {
         return bounds;
-    }
-
-    public void setBounds(WorldBounds bounds) {
-        this.bounds = bounds;
     }
 
     public Physics getPhysics() {
         return physics;
     }
 
-    public void setPhysics(Physics physics) {
-        this.physics = physics;
+    public List<IPhysical> getPhysicalObjects() {
+        return physicalObjects;
     }
 }

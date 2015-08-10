@@ -1,6 +1,9 @@
 package com.alc.game.server.Processing;
 
+import com.alc.game.server.Colliders.Collider;
 import com.alc.game.common.Data.XYZ;
+import com.alc.game.server.Data.Constants;
+import com.alc.game.server.Data.IPhysical;
 import com.alc.game.server.Data.ServerData;
 import com.alc.socket.server.Instructions.AbstractInstructionManager;
 import com.alc.socket.server.Instructions.IInstruction;
@@ -69,12 +72,15 @@ public class Processor extends AbstractProcessor {
 
             velocity = velocity.addY(-serverData.getWorld().getPhysics().getFreeFallAcceleration() * tickSeconds);
 
-            XYZ distane = velocity.product(tickSeconds);
-            distane = serverData.getWorld().getBounds().cutDistance(client.getPlayer().getSize(), position, distane);
-            if (Math.abs(distane.y) < 0.00001) {
+            XYZ distance = velocity.product(tickSeconds);
+            distance = Collider.getRedirectedDistance(serverData.getWorld(), client.getPlayer().getSize(), position, distance);
+            for (IPhysical object : serverData.getWorld().getPhysicalObjects()) {
+                distance = Collider.getRedirectedDistance(object, client.getPlayer(), distance);
+            }
+            if (Math.abs(distance.y) < Constants.EPSILON) {
                 velocity = new XYZ(0, 0, 0);
             }
-            position = position.add(distane);
+            position = position.add(distance);
             client.getPlayer().setPosition(position);
             client.getPlayer().setVelocity(velocity);
 
