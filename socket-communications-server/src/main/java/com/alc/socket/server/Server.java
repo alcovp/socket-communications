@@ -17,36 +17,33 @@ import java.util.concurrent.Executors;
 public class Server {
     public static void start(final AbstractServerData serverData,
                              final AbstractInstructionManager instructionManager) {
-        Thread acceptorThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //
-                //  LAUNCHING
-                //
-                ExecutorService executor = Executors.newCachedThreadPool();
-                try {
-                    ServerSocket serverSocket = new ServerSocket(999); // TODO тащить порт из настроек, например из файла
-                    while (true) {
-                        final Socket socket = serverSocket.accept();
-                        final AbstractClient client = serverData.acceptClient(socket);
-                        //CommonLogger.log(client.getId().toString() + " connected");
-                        System.out.println(client.getId().toString() + " connected");
-                        executor.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                while (client.isScannable()) {
-                                    instructionManager.putMessage(client, client.scan());
-                                }
-                                serverData.getClients().remove(client);
-                                client.close();
-                                //CommonLogger.log(client.getId().toString() + " disconnected");
-                                System.out.println(client.getId().toString() + " disconnected");
+        Thread acceptorThread = new Thread(() -> {
+            //
+            //  LAUNCHING
+            //
+            ExecutorService executor = Executors.newCachedThreadPool();
+            try {
+                ServerSocket serverSocket = new ServerSocket(999); // TODO тащить порт из настроек, например из файла
+                while (true) {
+                    final Socket socket = serverSocket.accept();
+                    final AbstractClient client = serverData.acceptClient(socket);
+                    //CommonLogger.log(client.getId().toString() + " connected");
+                    System.out.println(client.getId().toString() + " connected");
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            while (client.isScannable()) {
+                                instructionManager.putMessage(client, client.scan());
                             }
-                        });
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                            serverData.getClients().remove(client);
+                            client.close();
+                            //CommonLogger.log(client.getId().toString() + " disconnected");
+                            System.out.println(client.getId().toString() + " disconnected");
+                        }
+                    });
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
 

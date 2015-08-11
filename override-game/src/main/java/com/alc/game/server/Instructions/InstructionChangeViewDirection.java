@@ -24,7 +24,7 @@ public class InstructionChangeViewDirection implements IInstruction<ServerData> 
     public void execute(ServerData data) {
         Client client = data.findClientById(clientId);
         if (client != null) {
-            client.getPlayer().setViewDirection(viewDirection);
+            client.getPlayer().setDirection(viewDirection);
         }
     }
 

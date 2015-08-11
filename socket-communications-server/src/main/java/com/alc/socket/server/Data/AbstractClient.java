@@ -15,7 +15,7 @@ import java.util.UUID;
 public class AbstractClient {
     private UUID id;
     private Scanner scanner;
-    private Writer writer;
+    private ObjectOutputStream writer;
 
     public AbstractClient(Socket socket) {
         this.id = UUID.randomUUID();
@@ -23,7 +23,7 @@ public class AbstractClient {
         try {
             Reader reader = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
             this.scanner = new Scanner(reader).useDelimiter(CommonConstants.DELIMITER);
-            this.writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
+            this.writer = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -46,9 +46,20 @@ public class AbstractClient {
         }
     }
 
+    @Deprecated
     public void write(String msg) {
         try {
-            writer.write(msg + CommonConstants.DELIMITER);
+            writer.writeUTF(msg + CommonConstants.DELIMITER);
+            writer.flush();
+        } catch (IOException e) {
+            CommonLogger.log(e.getMessage());
+        }
+    }
+
+    public void writeObject(Object obj) {
+        try {
+            writer.reset(); //TODO проверить, нужно ли это
+            writer.writeObject(obj);
             writer.flush();
         } catch (IOException e) {
             CommonLogger.log(e.getMessage());

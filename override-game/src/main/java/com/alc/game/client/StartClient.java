@@ -1,10 +1,13 @@
 package com.alc.game.client;
 
 import com.alc.game.client.Data.ClientData;
+import com.alc.game.common.Data.*;
+import com.alc.game.common.Data.Character;
 import com.alc.socket.client.Client;
 
 import javax.swing.*;
 import java.io.Writer;
+import java.util.List;
 
 /**
  * Created by alc on 04.04.2015.
@@ -22,8 +25,8 @@ public class StartClient {
             }
 
             @Override
-            protected void scanMessage(String message) {
-                data.setSerializedData(message);
+            protected void scanMessage(Object message) {
+                data.setCharacters((List<Character>) message);
             }
         };
         client.start();

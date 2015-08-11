@@ -48,6 +48,7 @@ public class Collider {
         AABB movingBounds = moving.getBounds();
 
 
+        //TODO строить новый AABB, содержащий активный AABB и передвинутый AABB, и проверять его пересечение с target AABB
         //TODO учитывать случаи, когда отрезки не могут попасть в цель из-за ее маленьких размеров
         List<XYZ> cornerPoints = new ArrayList<>(Arrays.asList(
                 new XYZ(movingBounds.x1, movingBounds.y1, movingBounds.z1),

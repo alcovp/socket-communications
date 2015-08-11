@@ -1,5 +1,7 @@
 package com.alc.game.client.Data;
 
+import com.alc.game.common.Data.Character;
+
 import java.util.List;
 
 /**
@@ -7,9 +9,6 @@ import java.util.List;
  */
 public class ClientData {
 
-    //TODO
-    //serializedData нужна пока есть только текстовый визуализатор. для теста
-    private String serializedData;
     private Character me = new Character();
     private List<Character> characters;
 
@@ -19,14 +18,6 @@ public class ClientData {
 
     public void setMe(Character me) {
         this.me = me;
-    }
-
-    public String getSerializedData() {
-        return serializedData;
-    }
-
-    public void setSerializedData(String serializedData) {
-        this.serializedData = serializedData;
     }
 
     public List<Character> getCharacters() {

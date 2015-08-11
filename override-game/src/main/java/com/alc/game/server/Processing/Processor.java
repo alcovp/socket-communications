@@ -1,13 +1,16 @@
 package com.alc.game.server.Processing;
 
+import com.alc.game.common.Data.*;
+import com.alc.game.common.Data.Character;
 import com.alc.game.server.Colliders.Collider;
-import com.alc.game.common.Data.XYZ;
 import com.alc.game.server.Data.Constants;
 import com.alc.game.server.Data.IPhysical;
 import com.alc.game.server.Data.ServerData;
 import com.alc.socket.server.Instructions.AbstractInstructionManager;
 import com.alc.socket.server.Instructions.IInstruction;
 import com.alc.socket.server.Processing.AbstractProcessor;
+
+import java.util.stream.Collectors;
 
 /**
  * Created by alc on 27.02.2015.
@@ -32,13 +35,10 @@ public class Processor extends AbstractProcessor {
         double tickSeconds = (newTickTime - lastTick) / 1000.0;
         lastTick = newTickTime;
 
-        StringBuilder infoBuilder = new StringBuilder();
-
-        infoBuilder.append("Players:\n");
         serverData.getClients().stream().forEach(client -> {
 
             XYZ position = client.getPlayer().getPosition();
-            XYZ direction = client.getPlayer().getViewDirection();
+            XYZ direction = client.getPlayer().getDirection();
             XYZ withinPlaneDirection = new XYZ(direction.x, 0, direction.z).normalize();
             XYZ left = direction.outerProduct(XYZ.yawAxis);
             double runSpeed = client.getPlayer().getRunSpeed();
@@ -84,15 +84,12 @@ public class Processor extends AbstractProcessor {
             client.getPlayer().setPosition(position);
             client.getPlayer().setVelocity(velocity);
 
-            infoBuilder
-                    .append("    ").append(client.getId().toString()).append(":\n")
-                    .append("        POSITION: ").append(client.getPlayer().getPosition().toString()).append("\n")
-                    .append("        DIRECTION: ").append(client.getPlayer().getViewDirection().toString()).append("\n");
         });
 
 
         serverData.getClients().stream().forEach(client -> {
-            client.write(infoBuilder.toString()); // TODO конструировать сообщение автоматически, что-то типа сериализации serverData
+            //TODO не посылать лишние данные. сейчас в клиент приходят поля всего Player, а не только Character
+            client.writeObject(serverData.getClients().stream().map(c -> (Character) c.getPlayer()).collect(Collectors.toList()));
         });
     }
 }

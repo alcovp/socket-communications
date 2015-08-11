@@ -55,7 +55,7 @@ public class MainFrame extends JFrame {
                             robot.mouseMove(robotLastMouseMoveX, robotLastMouseMoveY);
                             robotMovedMouse = true;
 
-                            XYZ view = data.getMe().getViewDirection();
+                            XYZ view = data.getMe().getDirection();
                             XYZ left = view.outerProduct(XYZ.yawAxis).normalize();
                             if (deltaX != 0) {
                                 view = view.rotateFromYaw(deltaX / 1000.0);
@@ -63,7 +63,7 @@ public class MainFrame extends JFrame {
                             if (deltaY != 0) {
                                 view = view.rotateFromAxis(-deltaY / 1000.0, left);
                             }
-                            data.getMe().setViewDirection(view);
+                            data.getMe().setDirection(view);
 
                             //TODO
                             //здесь записывать в ClientData.me направление взгляда. это пока что будет

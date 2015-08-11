@@ -1,10 +1,10 @@
 package com.alc.socket.client;
 
-import com.alc.socket.common.CommonConstants;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.Socket;
-import java.util.Scanner;
 
 /**
  * Created by alc on 26.01.2015.
@@ -14,17 +14,17 @@ public abstract class Client {
         Thread connectionThread = new Thread(() -> {
             try {
                 Socket socket = new Socket("localhost", 999); // TODO порт из настроек
-                Reader reader = new InputStreamReader(socket.getInputStream());
+                ObjectInputStream reader = new ObjectInputStream(socket.getInputStream());
                 final Writer writer = new OutputStreamWriter(socket.getOutputStream());
                 Thread writerThread = new Thread(() -> {
                     runWriterThread(writer);
                 });
                 writerThread.start();
-                Scanner scanner = new Scanner(reader).useDelimiter(CommonConstants.DELIMITER);
-                while (scanner.hasNext()) {
-                    scanMessage(scanner.next());
+//                Scanner scanner = new Scanner(reader).useDelimiter(CommonConstants.DELIMITER);
+                while (true/*scanner.hasNext()*/) {
+                    scanMessage(reader.readObject());
                 }
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -39,5 +39,5 @@ public abstract class Client {
 
     protected abstract void runWriterThread(Writer writer);
 
-    protected abstract void scanMessage(String message);
+    protected abstract void scanMessage(Object message);
 }

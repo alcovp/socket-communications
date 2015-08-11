@@ -1,15 +1,16 @@
 package com.alc.game.server.Data;
 
-import com.alc.game.common.Data.XYZ;
+import com.alc.game.common.Data.*;
+import com.alc.game.common.Data.Character;
+
+import java.io.Serializable;
 
 /**
  * Created by alc on 21.03.2015.
  */
-public class Player implements IPhysical {
+public class Player extends Character implements IPhysical {
 
-    private XYZ position = new XYZ(1, 10, 1);
     private XYZ velocity = new XYZ(0, 0, 0);
-    private XYZ viewDirection = new XYZ(1, 0, 0);
     private XYZ size = new XYZ(0.5, 1.8, 0.5);
     private double runSpeed = 2;
     private double jumpStartSpeed = 5;
@@ -30,14 +31,6 @@ public class Player implements IPhysical {
         );
     }
 
-
-    public XYZ getPosition() {
-        return position;
-    }
-
-    public void setPosition(XYZ position) {
-        this.position = position;
-    }
 
     public boolean isMovingForward() {
         return movingForward;
@@ -77,14 +70,6 @@ public class Player implements IPhysical {
 
     public void setRunSpeed(double runSpeed) {
         this.runSpeed = runSpeed;
-    }
-
-    public XYZ getViewDirection() {
-        return viewDirection;
-    }
-
-    public void setViewDirection(XYZ viewDirection) {
-        this.viewDirection = viewDirection;
     }
 
     public XYZ getSize() {

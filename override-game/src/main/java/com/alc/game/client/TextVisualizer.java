@@ -1,6 +1,8 @@
 package com.alc.game.client;
 
 import com.alc.game.client.Data.ClientData;
+import com.alc.game.common.Data.*;
+import com.alc.game.common.Data.Character;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -36,6 +38,15 @@ public class TextVisualizer extends JTextArea implements IVisualizer {
     }
 
     private void paint(ClientData data) {
-        this.setText(data.getSerializedData() + '\n');
+        StringBuilder infoBuilder = new StringBuilder();
+
+        infoBuilder.append("Players:\n");
+        for (Character character : data.getCharacters()) {
+            infoBuilder
+                    .append("    ").append("Payer Name_________").append(":\n")
+                    .append("        POSITION: ").append(character.getPosition().toString()).append("\n")
+                    .append("        DIRECTION: ").append(character.getDirection().toString()).append("\n");
+        }
+        this.setText(infoBuilder.toString());
     }
 }

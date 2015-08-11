@@ -1,16 +1,17 @@
 package com.alc.game.common.Data;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
  * Created by alc on 28.02.2015.
  */
-public class XYZ {
+public class XYZ implements Serializable {
+    public static final XYZ yawAxis = new XYZ(0, 1, 0);
     public double x;
     public double y;
     public double z;
-    public static final XYZ yawAxis = new XYZ(0, 1, 0);
 
     public XYZ(double x, double y, double z) {
         this.x = x;
