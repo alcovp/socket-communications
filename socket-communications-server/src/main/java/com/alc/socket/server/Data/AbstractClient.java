@@ -1,12 +1,11 @@
 package com.alc.socket.server.Data;
 
 import com.alc.socket.common.CommonConstants;
-import com.alc.socket.common.CommonLogger;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 import java.util.UUID;
 
 /**
@@ -14,32 +13,38 @@ import java.util.UUID;
  */
 public class AbstractClient {
     private UUID id;
-    private Scanner scanner;
     private ObjectOutputStream writer;
+    private ObjectInputStream reader;
 
     public AbstractClient(Socket socket) {
         this.id = UUID.randomUUID();
 
         try {
-            Reader reader = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
-            this.scanner = new Scanner(reader).useDelimiter(CommonConstants.DELIMITER);
-            this.writer = new ObjectOutputStream(socket.getOutputStream());
+            // writer должен создаваться первее ридера, чтобы избежать дедлока
+            writer = new ObjectOutputStream(socket.getOutputStream());
+            reader = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String scan() {
-        return scanner.next();
+    public Object scanObject() throws IOException, ClassNotFoundException {
+        return reader.readObject();
     }
 
+    @Deprecated
+    public String scan() throws IOException {
+        return reader.readUTF();
+    }
+
+    @Deprecated
     public boolean isScannable() {
-        return scanner.hasNext();
+        return true;
     }
 
     public void close() {
-        scanner.close();
         try {
+            reader.close();
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -52,7 +57,7 @@ public class AbstractClient {
             writer.writeUTF(msg + CommonConstants.DELIMITER);
             writer.flush();
         } catch (IOException e) {
-            CommonLogger.log(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -62,7 +67,7 @@ public class AbstractClient {
             writer.writeObject(obj);
             writer.flush();
         } catch (IOException e) {
-            CommonLogger.log(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

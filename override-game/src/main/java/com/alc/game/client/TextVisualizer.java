@@ -16,11 +16,8 @@ import java.io.IOException;
  */
 public class TextVisualizer extends JTextArea implements IVisualizer {
 
-    private final ClientData data;
-
     public TextVisualizer(ClientData data) {
         super();
-        this.data = data;
         this.setVisible(true);
         this.setEditable(false);
         this.setPreferredSize(new Dimension(640, 480));
@@ -43,7 +40,7 @@ public class TextVisualizer extends JTextArea implements IVisualizer {
         infoBuilder.append("Players:\n");
         for (Character character : data.getCharacters()) {
             infoBuilder
-                    .append("    ").append("Payer Name_________").append(":\n")
+                    .append("    ").append(character.getName()).append(":\n")
                     .append("        POSITION: ").append(character.getPosition().toString()).append("\n")
                     .append("        DIRECTION: ").append(character.getDirection().toString()).append("\n");
         }

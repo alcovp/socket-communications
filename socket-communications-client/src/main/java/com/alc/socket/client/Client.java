@@ -2,8 +2,7 @@ package com.alc.socket.client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
@@ -15,13 +14,12 @@ public abstract class Client {
             try {
                 Socket socket = new Socket("localhost", 999); // TODO порт из настроек
                 ObjectInputStream reader = new ObjectInputStream(socket.getInputStream());
-                final Writer writer = new OutputStreamWriter(socket.getOutputStream());
+                final ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
                 Thread writerThread = new Thread(() -> {
                     runWriterThread(writer);
                 });
                 writerThread.start();
-//                Scanner scanner = new Scanner(reader).useDelimiter(CommonConstants.DELIMITER);
-                while (true/*scanner.hasNext()*/) {
+                while (true) {
                     scanMessage(reader.readObject());
                 }
             } catch (IOException | ClassNotFoundException e) {
@@ -37,7 +35,7 @@ public abstract class Client {
         }
     }
 
-    protected abstract void runWriterThread(Writer writer);
+    protected abstract void runWriterThread(ObjectOutputStream writer);
 
     protected abstract void scanMessage(Object message);
 }

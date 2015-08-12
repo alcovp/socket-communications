@@ -23,5 +23,5 @@ public abstract class AbstractInstructionManager {
         return !instructions.isEmpty();
     }
 
-    public abstract void putMessage(AbstractClient client, String message);
+    public abstract void putMessage(AbstractClient client, Object message);
 }

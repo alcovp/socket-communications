@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Character implements Serializable {
     protected XYZ position = new XYZ(1, 10, 1);
     protected XYZ direction = new XYZ(1, 0, 0);
+    protected String name = "Name";
 
     public XYZ getPosition() {
         return position;
@@ -23,5 +24,13 @@ public class Character implements Serializable {
 
     public void setDirection(XYZ direction) {
         this.direction = direction;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

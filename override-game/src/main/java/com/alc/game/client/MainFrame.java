@@ -10,7 +10,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by alc on 04.04.2015.
@@ -22,7 +24,7 @@ public class MainFrame extends JFrame {
     private Robot robot;
     private boolean robotMovedMouse;
 
-    public MainFrame(Writer writer, ClientData data) {
+    public MainFrame(ObjectOutputStream writer, ClientData data) {
         super("title");
 
         try {
@@ -65,13 +67,11 @@ public class MainFrame extends JFrame {
                             }
                             data.getMe().setDirection(view);
 
-                            //TODO
-                            //здесь записывать в ClientData.me направление взгляда. это пока что будет
-                            //единственный параметр, который задается клиентом непосредственно
-                            writer.write(Protocol.buildCommand(Protocol.CMD_VIEW_VECTOR,
-                                    view.x,
-                                    view.y,
-                                    view.z) + CommonConstants.DELIMITER);
+                            writer.reset();
+                            writer.writeObject(new ArrayList<Object>(Arrays.asList(
+                                    Protocol.CMD_VIEW_VECTOR.getKey(),
+                                    view
+                            )));
                             writer.flush();
                         } catch (IOException e) {
                             throw new RuntimeException(e);

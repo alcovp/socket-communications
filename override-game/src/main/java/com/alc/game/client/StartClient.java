@@ -1,12 +1,11 @@
 package com.alc.game.client;
 
 import com.alc.game.client.Data.ClientData;
-import com.alc.game.common.Data.*;
 import com.alc.game.common.Data.Character;
 import com.alc.socket.client.Client;
 
 import javax.swing.*;
-import java.io.Writer;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
 /**
@@ -17,7 +16,7 @@ public class StartClient {
         ClientData data = new ClientData();
         Client client = new Client() {
             @Override
-            protected void runWriterThread(Writer writer) {
+            protected void runWriterThread(ObjectOutputStream writer) {
                 MainFrame frame = new MainFrame(writer, data);
                 frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 frame.pack();

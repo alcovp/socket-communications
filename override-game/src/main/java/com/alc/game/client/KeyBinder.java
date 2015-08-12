@@ -1,12 +1,13 @@
 package com.alc.game.client;
 
 import com.alc.game.common.Protocol;
-import com.alc.socket.common.CommonConstants;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,14 +24,18 @@ public class KeyBinder {
         return instance;
     }
 
-    public void bindKeys(final Writer writer, JComponent component) {
+    public void bindKeys(final ObjectOutputStream writer, JComponent component) {
         for (Map.Entry<KeyStroke, String> entry : bindings.entrySet()) {
             component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(entry.getKey(), entry.getValue());
             component.getActionMap().put(entry.getValue(),
                     new AbstractAction() {
                         public void actionPerformed(ActionEvent event) {
                             try {
-                                writer.write(Protocol.buildCommand(Protocol.CMD_CONTROL_KEY, entry.getValue()) + CommonConstants.DELIMITER);
+                                writer.reset();
+                                writer.writeObject(new ArrayList<Object>(Arrays.asList(
+                                        Protocol.CMD_CONTROL_KEY.getKey(),
+                                        entry.getValue()
+                                )));
                                 writer.flush();
                             } catch (IOException e) {
                                 throw new RuntimeException(e);

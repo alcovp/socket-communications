@@ -39,7 +39,7 @@ public enum Protocol {
         this.key = key;
     }
 
-    private static Protocol findByKey(String key) {
+    public static Protocol findByKey(String key) {
         return protocolMap.get(key);
     }
 
@@ -47,6 +47,7 @@ public enum Protocol {
         return key;
     }
 
+    @Deprecated
     private static String buildArgsMsg(double... args) {
         StringBuilder builder = new StringBuilder(ARGS_SET_OPEN);
         boolean first = true;
@@ -61,6 +62,7 @@ public enum Protocol {
         return builder.toString();
     }
 
+    @Deprecated
     private static String buildArgsMsg(String... args) {
         StringBuilder builder = new StringBuilder(ARGS_SET_OPEN);
         boolean first = true;
@@ -75,6 +77,7 @@ public enum Protocol {
         return builder.toString();
     }
 
+    @Deprecated
     public static String buildCommand(Protocol cmd, double... args) {
         StringBuilder builder = new StringBuilder(cmd.getKey());
         builder.append(CMD_AND_ARG_DELIMITER);
@@ -82,6 +85,7 @@ public enum Protocol {
         return builder.toString();
     }
 
+    @Deprecated
     public static String buildCommand(Protocol cmd, String... args) {
         StringBuilder builder = new StringBuilder(cmd.getKey());
         builder.append(CMD_AND_ARG_DELIMITER);
@@ -89,14 +93,17 @@ public enum Protocol {
         return builder.toString();
     }
 
+    @Deprecated
     public static Protocol parseInstructionCmd(String msg) {
         return findByKey(msg.substring(0, msg.indexOf(CMD_AND_ARG_DELIMITER)));
     }
 
+    @Deprecated
     public static Protocol parseConstInstructionArg(String msg) {
         return findByKey(msg.substring(msg.indexOf(ARGS_SET_OPEN) + 1, msg.indexOf(ARGS_SET_CLOSE)));
     }
 
+    @Deprecated
     public static List<Double> parseDoubleInstructionArgs(String msg) {
         List<String> args = Arrays.asList(msg.substring(msg.indexOf(ARGS_SET_OPEN) + 1, msg.indexOf(ARGS_SET_CLOSE)).split(ARGS_DELIMITER));
         return new ArrayList<>(args.stream().map(Double::parseDouble).collect(Collectors.toList()));

@@ -1,6 +1,5 @@
 package com.alc.socket.server;
 
-import com.alc.socket.common.CommonLogger;
 import com.alc.socket.server.Data.AbstractClient;
 import com.alc.socket.server.Data.AbstractServerData;
 import com.alc.socket.server.Instructions.AbstractInstructionManager;
@@ -8,6 +7,7 @@ import com.alc.socket.server.Instructions.AbstractInstructionManager;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,13 +32,19 @@ public class Server {
                     executor.execute(new Runnable() {
                         @Override
                         public void run() {
-                            while (client.isScannable()) {
-                                instructionManager.putMessage(client, client.scan());
+                            while (true) {
+                                try {
+                                    instructionManager.putMessage(client, client.scanObject());
+                                } catch (SocketException e) {
+                                    serverData.getClients().remove(client);
+                                    client.close();
+                                    //CommonLogger.log(client.getId().toString() + " disconnected");
+                                    System.out.println(client.getId().toString() + " disconnected");
+                                    return;
+                                } catch (IOException | ClassNotFoundException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
-                            serverData.getClients().remove(client);
-                            client.close();
-                            //CommonLogger.log(client.getId().toString() + " disconnected");
-                            System.out.println(client.getId().toString() + " disconnected");
                         }
                     });
                 }

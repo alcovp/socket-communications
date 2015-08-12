@@ -14,14 +14,15 @@ import java.util.List;
  */
 public class InstructionManager extends AbstractInstructionManager {
     @Override
-    public void putMessage(AbstractClient client, String message) {
+    public void putMessage(AbstractClient client, Object message) {
         try {
             IInstruction instruction;
 
-            Protocol cmd = Protocol.parseInstructionCmd(message);
+            List<Object> messageList = (List<Object>) message;
+            Protocol cmd = Protocol.findByKey((String)messageList.get(0));
             switch (cmd) {
                 case CMD_CONTROL_KEY:
-                    Protocol controlArg = Protocol.parseConstInstructionArg(message);
+                    Protocol controlArg = Protocol.findByKey((String) messageList.get(1));
                     switch (controlArg) {
                         case PLAYER_MOVE_FORWARD:
                             instruction = new InstructionStartMoving(client.getId(), true, false, false, false);
@@ -56,8 +57,8 @@ public class InstructionManager extends AbstractInstructionManager {
                     }
                     break;
                 case CMD_VIEW_VECTOR:
-                    List<Double> viewArgs = Protocol.parseDoubleInstructionArgs(message);
-                    instruction = new InstructionChangeViewDirection(client.getId(), new XYZ(viewArgs.get(0), viewArgs.get(1), viewArgs.get(2)));
+                    XYZ view = (XYZ) messageList.get(1);
+                    instruction = new InstructionChangeViewDirection(client.getId(), view);
                     break;
                 default:
                     instruction = new WriteConsoleInstruction(client.getId().toString() + ": " + message);
