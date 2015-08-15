@@ -1,26 +1,27 @@
-package com.alc.game.client;
+package com.alc.game.client.Visualizers;
 
 import com.alc.game.client.Data.ClientData;
-import com.alc.game.common.Data.*;
+import com.alc.game.client.MouseProcessor;
 import com.alc.game.common.Data.Character;
 
 import javax.swing.*;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 /**
  * Created by alc on 04.04.2015.
  */
-public class TextVisualizer extends JTextArea implements IVisualizer {
+public class TextVisualizer extends AbstractVisualizer {
 
-    public TextVisualizer(ClientData data) {
-        super();
-        this.setVisible(true);
-        this.setEditable(false);
-        this.setPreferredSize(new Dimension(640, 480));
+    private final JTextArea text = new JTextArea();
+
+    public TextVisualizer(ObjectOutputStream writer, ClientData data) {
+        super(data);
+        text.setVisible(true);
+        text.setPreferredSize(new Dimension(640, 480));
+        text.setEditable(false);
+        this.add(text);
+        text.addMouseMotionListener(new MouseProcessor(writer, data, this));
         Thread painterThread = new Thread(() -> {
             try {
                 while (true) {
@@ -44,6 +45,6 @@ public class TextVisualizer extends JTextArea implements IVisualizer {
                     .append("        POSITION: ").append(character.getPosition().toString()).append("\n")
                     .append("        DIRECTION: ").append(character.getDirection().toString()).append("\n");
         }
-        this.setText(infoBuilder.toString());
+        text.setText(infoBuilder.toString());
     }
 }

@@ -1,7 +1,7 @@
 package com.alc.game.server.Instructions;
 
 import com.alc.game.common.Data.XYZ;
-import com.alc.game.common.Protocol;
+import com.alc.game.common.Protocol.Protocol;
 import com.alc.socket.server.Data.AbstractClient;
 import com.alc.socket.server.Instructions.AbstractInstructionManager;
 import com.alc.socket.server.Instructions.IInstruction;

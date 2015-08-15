@@ -1,4 +1,4 @@
-package com.alc.game.common;
+package com.alc.game.common.Protocol;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,7 +19,10 @@ public enum Protocol {
     PLAYER_STOP_LEFT("sl"),
     PLAYER_JUMP("j"),
 
-    CMD_VIEW_VECTOR("V");
+    CMD_VIEW_VECTOR("V"),
+
+    RESPONSE_PLAYERS("ps"),
+    RESPONSE_WORLD("w");
 
     private final String key;
     private static Map<String, Protocol> protocolMap = new HashMap<>();

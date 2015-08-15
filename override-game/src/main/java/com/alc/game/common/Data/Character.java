@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by alc on 07.04.2015.
  */
 public class Character implements Serializable {
-    protected XYZ position = new XYZ(1, 10, 1);
+    protected XYZ position = new XYZ(1, 5, 1);
     protected XYZ direction = new XYZ(1, 0, 0);
     protected String name = "Name";
 

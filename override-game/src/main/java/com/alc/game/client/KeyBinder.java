@@ -1,6 +1,6 @@
 package com.alc.game.client;
 
-import com.alc.game.common.Protocol;
+import com.alc.game.common.Protocol.Protocol;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

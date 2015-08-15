@@ -8,7 +8,8 @@ import java.text.NumberFormat;
  * Created by alc on 28.02.2015.
  */
 public class XYZ implements Serializable {
-    public static final XYZ yawAxis = new XYZ(0, 1, 0);
+    public static final XYZ yawAxis = new XYZ(0, -1, 0);
+    public static final XYZ yAxis = new XYZ(0, 1, 0);
     public double x;
     public double y;
     public double z;

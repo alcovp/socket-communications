@@ -1,4 +1,8 @@
-package com.alc.game.server.Data;
+package com.alc.game.common.Data;
+
+import com.alc.game.server.Data.AABB;
+import com.alc.game.server.Data.IPhysical;
+import com.alc.game.server.Data.Physics;
 
 import java.util.List;
 
@@ -7,13 +11,15 @@ import java.util.List;
  */
 public class World implements IPhysical {
     private final AABB bounds;
-    private final Physics physics;
+    private transient final Physics physics;
     private final List<IPhysical> physicalObjects;
+    private final List<Light> lights;
 
-    public World(AABB bounds, Physics physics, List<IPhysical> physicalObjects) {
+    public World(AABB bounds, Physics physics, List<IPhysical> physicalObjects, List<Light> lights) {
         this.bounds = bounds;
         this.physics = physics;
         this.physicalObjects = physicalObjects;
+        this.lights = lights;
     }
 
     public AABB getBounds() {
@@ -26,5 +32,9 @@ public class World implements IPhysical {
 
     public List<IPhysical> getPhysicalObjects() {
         return physicalObjects;
+    }
+
+    public List<Light> getLights() {
+        return lights;
     }
 }

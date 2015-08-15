@@ -2,6 +2,8 @@ package com.alc.game.server.Processing;
 
 import com.alc.game.common.Data.*;
 import com.alc.game.common.Data.Character;
+import com.alc.game.common.Protocol.Protocol;
+import com.alc.game.common.Protocol.Response;
 import com.alc.game.server.Colliders.Collider;
 import com.alc.game.server.Data.Constants;
 import com.alc.game.server.Data.IPhysical;
@@ -10,6 +12,8 @@ import com.alc.socket.server.Instructions.AbstractInstructionManager;
 import com.alc.socket.server.Instructions.IInstruction;
 import com.alc.socket.server.Processing.AbstractProcessor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
@@ -88,8 +92,18 @@ public class Processor extends AbstractProcessor {
 
 
         serverData.getClients().stream().forEach(client -> {
-            //TODO не посылать лишние данные. сейчас в клиент приходят поля всего Player, а не только Character
-            client.writeObject(serverData.getClients().stream().map(c -> (Character) c.getPlayer()).collect(Collectors.toList()));
+            //TODO возможно, нужен диспетчер
+            //TODO не посылать лишние данные. например, сейчас в клиент приходят поля всего Player, а не только Character
+            client.writeObject(new ArrayList<>(Arrays.asList(
+                    new Response(
+                            Protocol.RESPONSE_WORLD.getKey(),
+                            serverData.getWorld()
+                    ),
+                    new Response(
+                            Protocol.RESPONSE_PLAYERS.getKey(),
+                            serverData.getClients().stream().map(c -> (Character) c.getPlayer()).collect(Collectors.toList())
+                    )
+            )));
         });
     }
 }

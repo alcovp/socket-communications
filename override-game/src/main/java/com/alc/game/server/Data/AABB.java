@@ -1,9 +1,11 @@
 package com.alc.game.server.Data;
 
+import java.io.Serializable;
+
 /**
  * Created by alc on 29.07.2015.
  */
-public class AABB {
+public class AABB implements Serializable {
     public double x1;
     public double x2;
     public double y1;
