@@ -3,7 +3,7 @@ package com.alc.game.server.Data;
 import com.alc.game.common.Data.*;
 import com.alc.game.common.Data.Character;
 
-import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Created by alc on 21.03.2015.
@@ -11,7 +11,6 @@ import java.io.Serializable;
 public class Player extends Character implements IPhysical {
 
     private XYZ velocity = new XYZ(0, 0, 0);
-    private XYZ size = new XYZ(0.5, 1.8, 0.5);
     private double runSpeed = 2;
     private double jumpStartSpeed = 5;
     private boolean jumping = false;
@@ -19,6 +18,10 @@ public class Player extends Character implements IPhysical {
     private boolean movingBackward = false;
     private boolean movingRight = false;
     private boolean movingLeft = false;
+
+    public Player() {
+        super(UUID.randomUUID());
+    }
 
     public AABB getBounds() {
         return new AABB(
@@ -30,7 +33,6 @@ public class Player extends Character implements IPhysical {
                 position.z + size.z / 2
         );
     }
-
 
     public boolean isMovingForward() {
         return movingForward;
@@ -70,14 +72,6 @@ public class Player extends Character implements IPhysical {
 
     public void setRunSpeed(double runSpeed) {
         this.runSpeed = runSpeed;
-    }
-
-    public XYZ getSize() {
-        return size;
-    }
-
-    public void setSize(XYZ size) {
-        this.size = size;
     }
 
     public XYZ getVelocity() {

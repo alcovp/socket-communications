@@ -60,6 +60,9 @@ public class InstructionManager extends AbstractInstructionManager {
                     XYZ view = (XYZ) messageList.get(1);
                     instruction = new InstructionChangeViewDirection(client.getId(), view);
                     break;
+                case CMD_INITIAL:
+                    instruction = new InstructionSendInitialResponse(client.getId());
+                    break;
                 default:
                     instruction = new WriteConsoleInstruction(client.getId().toString() + ": " + message);
                     break;

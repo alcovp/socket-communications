@@ -12,7 +12,7 @@ import java.util.UUID;
  * Created by admin on 25.02.2015.
  */
 public class AbstractClient {
-    private UUID id;
+    private final UUID id;
     private ObjectOutputStream writer;
     private ObjectInputStream reader;
 

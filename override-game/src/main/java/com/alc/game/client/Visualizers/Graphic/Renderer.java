@@ -1,8 +1,8 @@
 package com.alc.game.client.Visualizers.Graphic;
 
 import com.alc.game.client.Data.ClientData;
-import com.alc.game.common.Data.Light;
-import com.alc.game.common.Data.XYZ;
+import com.alc.game.common.Data.*;
+import com.alc.game.common.Data.Character;
 import com.alc.game.server.Data.AABB;
 import com.alc.game.server.Data.IPhysical;
 
@@ -10,6 +10,7 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+import java.util.List;
 
 /**
  * Created by alc on 14.08.2015.
@@ -74,31 +75,42 @@ class Renderer implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         gl.glLoadIdentity();
 
-        XYZ viewPoint = data.getMe().getPosition().add(data.getMe().getDirection());
-        glu.gluLookAt(
-                data.getMe().getPosition().x,
-                data.getMe().getPosition().y,
-                data.getMe().getPosition().z,
-                viewPoint.x,
-                viewPoint.y,
-                viewPoint.z,
-                XYZ.yAxis.x,
-                XYZ.yAxis.y,
-                XYZ.yAxis.z
-        );
+        if (data.getMe() != null) {
+            XYZ viewPoint = data.getMe().getEyesPosition().add(data.getMe().getDirection());
+            glu.gluLookAt(
+                    data.getMe().getEyesPosition().x,
+                    data.getMe().getEyesPosition().y,
+                    data.getMe().getEyesPosition().z,
+                    viewPoint.x,
+                    viewPoint.y,
+                    viewPoint.z,
+                    XYZ.yAxis.x,
+                    XYZ.yAxis.y,
+                    XYZ.yAxis.z
+            );
 
-        Light light = data.getWorld().getLights().get(0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, light.getAmbient(), 0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, light.getSpecular(), 0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, light.getDiffuse(), 0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, light.getCenter4f(), 0);
-        gl.glLightf(GL2.GL_LIGHT0, GL2.GL_CONSTANT_ATTENUATION, light.getConstantAttenuation());
-        gl.glLightf(GL2.GL_LIGHT0, GL2.GL_LINEAR_ATTENUATION, light.getLinearAttenuation());
-        gl.glLightf(GL2.GL_LIGHT0, GL2.GL_QUADRATIC_ATTENUATION, light.getQuadraticAttenuation());
+            if (data.getWorld() != null) {
+                List<Light> lights = data.getWorld().getLights();
+                for (Light light : lights) {
+                    int lightNum = GL2.GL_LIGHT0 + lights.indexOf(light);
+                    gl.glLightfv(lightNum, GL2.GL_AMBIENT, light.getAmbient(), 0);
+                    gl.glLightfv(lightNum, GL2.GL_SPECULAR, light.getSpecular(), 0);
+                    gl.glLightfv(lightNum, GL2.GL_DIFFUSE, light.getDiffuse(), 0);
+                    gl.glLightfv(lightNum, GL2.GL_POSITION, light.getCenter4f(), 0);
+                    gl.glLightf(lightNum, GL2.GL_CONSTANT_ATTENUATION, light.getConstantAttenuation());
+                    gl.glLightf(lightNum, GL2.GL_LINEAR_ATTENUATION, light.getLinearAttenuation());
+                    gl.glLightf(lightNum, GL2.GL_QUADRATIC_ATTENUATION, light.getQuadraticAttenuation());
+                }
 
-        drawAABB(gl, data.getWorld().getBounds());
-        for (IPhysical object : data.getWorld().getPhysicalObjects()) {
-            drawAABB(gl, object.getBounds());
+                drawAABB(gl, data.getWorld().getBounds());
+                for (IPhysical object : data.getWorld().getPhysicalObjects()) {
+                    drawAABB(gl, object.getBounds());
+                }
+
+                for (Character character : data.getCharacters()) {
+                    drawAABB(gl, character.getBounds());
+                }
+            }
         }
 
         gl.glFlush();

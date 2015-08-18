@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ClientData {
 
-    private Character me = new Character();
+    private Character me;
     private List<Character> characters;
     private World world;
 

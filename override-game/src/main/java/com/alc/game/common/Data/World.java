@@ -10,12 +10,14 @@ import java.util.List;
  * Created by alc on 29.07.2015.
  */
 public class World implements IPhysical {
+    private final String name;
     private final AABB bounds;
-    private transient final Physics physics;
+    private final Physics physics;
     private final List<IPhysical> physicalObjects;
     private final List<Light> lights;
 
-    public World(AABB bounds, Physics physics, List<IPhysical> physicalObjects, List<Light> lights) {
+    public World(String name, AABB bounds, Physics physics, List<IPhysical> physicalObjects, List<Light> lights) {
+        this.name = name;
         this.bounds = bounds;
         this.physics = physics;
         this.physicalObjects = physicalObjects;
@@ -36,5 +38,9 @@ public class World implements IPhysical {
 
     public List<Light> getLights() {
         return lights;
+    }
+
+    public String getName() {
+        return name;
     }
 }

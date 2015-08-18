@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
  */
 public enum Protocol {
 
+    CMD_INITIAL("i"),
+
     CMD_CONTROL_KEY("C"),
     PLAYER_MOVE_FORWARD("f"),
     PLAYER_MOVE_BACKWARD("b"),
@@ -22,7 +24,7 @@ public enum Protocol {
     CMD_VIEW_VECTOR("V"),
 
     RESPONSE_PLAYERS("ps"),
-    RESPONSE_WORLD("w");
+    RESPONSE_INITIAL("ir");
 
     private final String key;
     private static Map<String, Protocol> protocolMap = new HashMap<>();

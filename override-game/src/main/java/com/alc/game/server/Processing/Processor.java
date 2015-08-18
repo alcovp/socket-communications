@@ -96,10 +96,6 @@ public class Processor extends AbstractProcessor {
             //TODO не посылать лишние данные. например, сейчас в клиент приходят поля всего Player, а не только Character
             client.writeObject(new ArrayList<>(Arrays.asList(
                     new Response(
-                            Protocol.RESPONSE_WORLD.getKey(),
-                            serverData.getWorld()
-                    ),
-                    new Response(
                             Protocol.RESPONSE_PLAYERS.getKey(),
                             serverData.getClients().stream().map(c -> (Character) c.getPlayer()).collect(Collectors.toList())
                     )

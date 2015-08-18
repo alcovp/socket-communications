@@ -16,20 +16,7 @@ import java.util.UUID;
  */
 public class ServerData extends AbstractServerData<Client> {
 
-    private World world = new World(
-            new AABB(0, 10, 0, 10, 0, 10),
-            new Physics(9.8),
-            new ArrayList<>(Arrays.asList(new Block(new AABB(4, 6, 0, 2, 4, 6)))),
-            new ArrayList<>(Arrays.asList(new Light(
-                    new XYZ(1, 1, 1),
-                    new float[]{1.0f, 1.0f, 1.0f, 1},
-                    new float[]{0.2f, 0.2f, 0.2f, 1},
-                    new float[]{1.0f, 1.0f, 1.0f, 1},
-                    0.0f,
-                    0.2f,
-                    0.02f
-            )))
-    );
+    private World world = ServerWorldFactory.buildWorld("default");
 
     @Override
     public AbstractClient acceptClient(Socket socket) {

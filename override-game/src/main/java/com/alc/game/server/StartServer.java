@@ -13,21 +13,13 @@ import com.alc.socket.server.Server;
  */
 public class StartServer {
     public static void main(String[] args) {
-        //
-        //  VARIABLES
-        //
+
         final ServerData serverData = new ServerData();
-        //
-        //  INSTRUCTIONS
-        //
+
         AbstractInstructionManager instructionManager = new InstructionManager();
-        //
-        //  PROCESSOR
-        //
+
         AbstractProcessor processor = new Processor(instructionManager, serverData);
-        //
-        //  LAUNCHING
-        //
+
         Server.start(serverData, instructionManager);
     }
 }
