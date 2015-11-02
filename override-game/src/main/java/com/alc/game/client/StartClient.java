@@ -3,6 +3,7 @@ package com.alc.game.client;
 import com.alc.game.client.Data.ClientData;
 import com.alc.game.client.Visualizers.AbstractVisualizer;
 import com.alc.game.client.Visualizers.Graphic.GraphicVisualizer;
+import com.alc.game.client.Visualizers.TextVisualizer;
 import com.alc.game.common.Protocol.Protocol;
 import com.alc.socket.client.Client;
 
@@ -22,7 +23,7 @@ public class StartClient {
             @Override
             protected void runWriterThread(ObjectOutputStream writer) {
                 AbstractVisualizer visualizer = new GraphicVisualizer(writer, data);
-//                AbstractVisualizer textVisualizer = new TextVisualizer(writer, data);
+//                AbstractVisualizer visualizer = new TextVisualizer(writer, data);
 
                 KeyBinder.getInstance().bindKeys(writer, visualizer.getRootPane());
 

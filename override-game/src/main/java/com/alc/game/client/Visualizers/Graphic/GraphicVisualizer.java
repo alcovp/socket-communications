@@ -23,7 +23,8 @@ public class GraphicVisualizer extends AbstractVisualizer {
         GLCapabilities capabilities = new GLCapabilities(glProfile);
         GLCanvas canvas = new GLCanvas(capabilities);
 
-        canvas.addGLEventListener(new Renderer(data));
+        FPSAnimator animator = new FPSAnimator(canvas, 1000, true);
+        canvas.addGLEventListener(new Renderer(data, this.getContentPane(), animator));
         canvas.addMouseMotionListener(new MouseProcessor(writer, data, this));
         this.add(canvas);
 
@@ -33,7 +34,6 @@ public class GraphicVisualizer extends AbstractVisualizer {
         Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
         this.getContentPane().setCursor(blankCursor);
 
-        FPSAnimator animator = new FPSAnimator(canvas, 100);
         animator.start();
     }
 }

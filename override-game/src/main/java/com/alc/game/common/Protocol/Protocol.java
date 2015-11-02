@@ -23,7 +23,7 @@ public enum Protocol {
 
     CMD_VIEW_VECTOR("V"),
 
-    RESPONSE_PLAYERS("ps"),
+    RESPONSE_CHARACTERS("ps"),
     RESPONSE_INITIAL("ir");
 
     private final String key;

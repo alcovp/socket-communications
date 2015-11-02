@@ -13,6 +13,7 @@ public class ClientData {
     private Character me;
     private List<Character> characters;
     private World world;
+    private ClientState clientState = ClientState.MENU;
 
     public Character getMe() {
         return me;
@@ -36,5 +37,13 @@ public class ClientData {
 
     public void setWorld(World world) {
         this.world = world;
+    }
+
+    public ClientState getClientState() {
+        return clientState;
+    }
+
+    public void setClientState(ClientState clientState) {
+        this.clientState = clientState;
     }
 }

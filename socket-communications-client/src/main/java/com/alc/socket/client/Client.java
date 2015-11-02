@@ -23,6 +23,7 @@ public abstract class Client {
                     scanMessage(reader.readObject());
                 }
             } catch (IOException | ClassNotFoundException e) {
+                System.exit(-1);
                 throw new RuntimeException(e);
             }
         });

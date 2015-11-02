@@ -28,7 +28,7 @@ public abstract class AbstractProcessor {
             public void run() {
                 timeTick();
             }
-        }, 100, 50);
+        }, 100, 20);
     }
 
     public abstract void process(IInstruction instruction);

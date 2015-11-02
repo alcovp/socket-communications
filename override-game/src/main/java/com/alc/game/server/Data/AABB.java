@@ -14,6 +14,9 @@ public class AABB implements Serializable {
     public double z2;
 
     public AABB(double x1, double x2, double y1, double y2, double z1, double z2) {
+        if (x1 > x2 || y1 > y2 || z1 > z2) {
+            throw new RuntimeException("Wrong parameters for AABB");
+        }
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;

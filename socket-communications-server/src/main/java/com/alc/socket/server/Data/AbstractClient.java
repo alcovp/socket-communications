@@ -45,9 +45,13 @@ public class AbstractClient {
     public void close() {
         try {
             reader.close();
+        } catch (IOException e) {
+            System.out.println(id.toString() + " reader is already closed");
+        }
+        try {
             writer.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(id.toString() + "writer is already closed");
         }
     }
 
@@ -67,7 +71,7 @@ public class AbstractClient {
             writer.writeObject(obj);
             writer.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Failed to write to " + id.toString());
         }
     }
 

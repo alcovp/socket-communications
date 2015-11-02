@@ -24,4 +24,6 @@ public abstract class AbstractInstructionManager {
     }
 
     public abstract void putMessage(AbstractClient client, Object message);
+
+    public abstract void disconnectClient(AbstractClient client);
 }

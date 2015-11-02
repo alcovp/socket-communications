@@ -1,6 +1,7 @@
 package com.alc.game.client;
 
 import com.alc.game.client.Data.ClientData;
+import com.alc.game.client.Data.ClientState;
 import com.alc.game.client.Data.ClientWorldFactory;
 import com.alc.game.common.Data.Character;
 import com.alc.game.common.Protocol.Protocol;
@@ -27,7 +28,7 @@ public class DataDispenser {
         for (Response response : responseList) {
             Protocol protocol = Protocol.findByKey(response.getKey());
             switch (protocol) {
-                case RESPONSE_PLAYERS:
+                case RESPONSE_CHARACTERS:
                     List<Character> characters = (List<Character>) response.getObject();
                     if (data.getMe() != null) {
                         Character me = characters.stream().filter(c -> c.equals(data.getMe())).findFirst().get();
@@ -40,6 +41,7 @@ public class DataDispenser {
                     List<String> initialResponse = (List<String>) response.getObject();
                     data.setMe(new Character(UUID.fromString(initialResponse.get(0))));
                     data.setWorld(ClientWorldFactory.buildWorld(initialResponse.get(1)));
+                    data.setClientState(ClientState.WORLD);
                     break;
                 default:
                     throw new IllegalStateException("Unknown response key");

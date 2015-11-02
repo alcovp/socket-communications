@@ -13,6 +13,10 @@
         <module>socket-communications-client</module>
         <module>socket-communications-common</module>
         <module>override-game</module>
+        <module>rendering-engine</module>
+        <module>ping-pong</module>
+        <module>application</module>
+        <module>physics</module>
     </modules>
 
 

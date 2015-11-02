@@ -1,0 +1,33 @@
+#version 330 core
+
+in vec2 textCoordFrag;
+in vec3 norm;
+in vec4 pos;
+in vec4 shadow_coord;
+
+out vec4 fragColor;
+
+uniform sampler2D tex;
+uniform sampler2DShadow depth_texture;
+uniform vec3 ambient;
+uniform vec3 lightC;
+uniform vec3 lightP;
+uniform vec3 lightA;
+uniform vec3 eye;
+
+void main() {
+    vec3 direction = normalize(lightP - pos.xyz);
+    float cosTheta = clamp(dot(norm, direction), 0, 1);
+    float distance = distance(pos.xyz, lightP);
+    float attenuation = 1 / (lightA.x + lightA.y * distance + lightA.z * distance * distance);
+    vec3 diffuseFactor = lightC * cosTheta * attenuation;
+
+    vec3 reflection = reflect(direction, norm);
+    vec3 eyeDirection = normalize(pos.xyz - eye);
+    float cosAlpha = clamp(dot(eyeDirection, reflection), 0, 1);
+    vec3 specularFactor = lightC * pow(cosAlpha, 5);
+
+    float f = textureProj(depth_texture, shadow_coord);
+    vec3 lightFactor = clamp(diffuseFactor * f + specularFactor * f + ambient, 0, 1);
+    fragColor = texture2D(tex, textCoordFrag.xy) * vec4(lightFactor, 1);
+}

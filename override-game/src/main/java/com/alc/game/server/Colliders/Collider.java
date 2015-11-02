@@ -46,9 +46,18 @@ public class Collider {
     public static XYZ getRedirectedDistance(final IPhysical target, final IPhysical moving, final XYZ distance) {
         AABB targetBounds = target.getBounds();
         AABB movingBounds = moving.getBounds();
+        AABB bigBounds = new AABB(
+                Math.min(movingBounds.x1, movingBounds.x1 + distance.x),
+                Math.max(movingBounds.x2, movingBounds.x2 + distance.x),
+                Math.min(movingBounds.y1, movingBounds.y1 + distance.y),
+                Math.max(movingBounds.y2, movingBounds.y2 + distance.y),
+                Math.min(movingBounds.z1, movingBounds.z1 + distance.z),
+                Math.max(movingBounds.z2, movingBounds.z2 + distance.z)
+        );
+        if (!bigBounds.isCollidesWith(targetBounds)) {
+            return distance;
+        }
 
-
-        //TODO строить новый AABB, содержащий активный AABB и передвинутый AABB, и проверять его пересечение с target AABB
         //TODO учитывать случаи, когда отрезки не могут попасть в цель из-за ее маленьких размеров
         List<XYZ> cornerPoints = new ArrayList<>(Arrays.asList(
                 new XYZ(movingBounds.x1, movingBounds.y1, movingBounds.z1),

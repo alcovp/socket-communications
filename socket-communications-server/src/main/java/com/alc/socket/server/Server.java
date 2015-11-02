@@ -4,7 +4,7 @@ import com.alc.socket.server.Data.AbstractClient;
 import com.alc.socket.server.Data.AbstractServerData;
 import com.alc.socket.server.Instructions.AbstractInstructionManager;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -27,26 +27,31 @@ public class Server {
                 while (true) {
                     final Socket socket = serverSocket.accept();
                     final AbstractClient client = serverData.acceptClient(socket);
-                    //CommonLogger.log(client.getId().toString() + " connected");
-                    System.out.println(client.getId().toString() + " connected");
-                    executor.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            while (true) {
-                                try {
-                                    instructionManager.putMessage(client, client.scanObject());
-                                } catch (SocketException e) {
-                                    serverData.getClients().remove(client);
-                                    client.close();
-                                    //CommonLogger.log(client.getId().toString() + " disconnected");
-                                    System.out.println(client.getId().toString() + " disconnected");
-                                    return;
-                                } catch (IOException | ClassNotFoundException e) {
-                                    throw new RuntimeException(e);
+                    if (client != null) {
+                        //CommonLogger.log(client.getId().toString() + " connected");
+                        System.out.println(client.getId().toString() + " connected");
+                        executor.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                while (true) {
+                                    try {
+                                        instructionManager.putMessage(client, client.scanObject());
+                                    } catch (SocketException e) {
+                                        client.close();
+                                        //CommonLogger.log(client.getId().toString() + " disconnected");
+                                        System.out.println(client.getId().toString() + " disconnected");
+                                        instructionManager.disconnectClient(client);
+                                        return;
+                                    } catch (IOException | ClassNotFoundException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    } else {
+                        System.out.println("failed to accept client");
+                        break;
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

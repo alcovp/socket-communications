@@ -5,6 +5,7 @@ import com.alc.game.common.Data.Character;
 import com.alc.game.common.Protocol.Protocol;
 import com.alc.game.common.Protocol.Response;
 import com.alc.game.server.Colliders.Collider;
+import com.alc.game.server.Data.Client;
 import com.alc.game.server.Data.Constants;
 import com.alc.game.server.Data.IPhysical;
 import com.alc.game.server.Data.ServerData;
@@ -96,8 +97,8 @@ public class Processor extends AbstractProcessor {
             //TODO не посылать лишние данные. например, сейчас в клиент приходят поля всего Player, а не только Character
             client.writeObject(new ArrayList<>(Arrays.asList(
                     new Response(
-                            Protocol.RESPONSE_PLAYERS.getKey(),
-                            serverData.getClients().stream().map(c -> (Character) c.getPlayer()).collect(Collectors.toList())
+                            Protocol.RESPONSE_CHARACTERS.getKey(),
+                            serverData.getClients().stream().map(Client::getPlayer).collect(Collectors.toList())
                     )
             )));
         });
