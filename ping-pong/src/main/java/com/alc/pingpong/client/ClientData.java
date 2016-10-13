@@ -5,6 +5,7 @@ import com.alc.pingpong.Player;
 import com.alc.pingpong.World;
 import com.alc.rendering.AbstractCamera;
 import com.alc.rendering.ArcBallCamera;
+import com.alc.rendering.Light;
 import org.joml.Vector3f;
 
 /**
@@ -12,14 +13,16 @@ import org.joml.Vector3f;
  */
 public class ClientData {
 
-    private final AbstractCamera camera;
+    private AbstractCamera camera;
     private World world;
     private Ball ball;
     private Player playerNear;
     private Player playerFar;
+    private Light light;
 
     public ClientData() {
         this.camera = new ArcBallCamera(new Vector3f(0, 0, 2), new Vector3f(0, 0, 0), new Vector3f(0, 1, 0));
+        this.light = new Light(new Vector3f(25, 25, 25), new Vector3f(1, 1, 1), new Vector3f(0.2f, 0.005f, 0.001f));
     }
 
     public Player getPlayerNear() {
@@ -56,5 +59,13 @@ public class ClientData {
 
     public void setWorld(World world) {
         this.world = world;
+    }
+
+    public Light getLight() {
+        return light;
+    }
+
+    public void setLight(Light light) {
+        this.light = light;
     }
 }

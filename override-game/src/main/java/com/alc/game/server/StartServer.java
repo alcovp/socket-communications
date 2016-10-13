@@ -1,6 +1,5 @@
 package com.alc.game.server;
 
-import com.alc.game.server.Data.Client;
 import com.alc.game.server.Data.ServerData;
 import com.alc.game.server.Instructions.InstructionManager;
 import com.alc.game.server.Processing.Processor;

@@ -1,15 +1,16 @@
 package com.alc.pingpong;
 
 import com.alc.physics.AABB;
+import com.alc.rendering.Material;
+import com.alc.rendering.Materials;
 
 import java.io.Serializable;
 
 /**
  * Created by alc on 06.10.2015.
  */
-public class World implements Serializable, IHasModel, IHasTexture {
-    private String modelId = ResourcesIds.WORLD_MODEL;
-    private String textureId = ResourcesIds.WORLD_TEXTURE;
+public class World implements Serializable, IHasModel, IHasTexture, IHasMaterial {
+
     private AABB bounds;
 
     public World(AABB bounds) {
@@ -26,11 +27,16 @@ public class World implements Serializable, IHasModel, IHasTexture {
 
     @Override
     public String getModelId() {
-        return modelId;
+        return ResourcesIds.WORLD_MODEL;
     }
 
     @Override
     public String getTextureId() {
-        return textureId;
+        return ResourcesIds.WORLD_TEXTURE;
+    }
+
+    @Override
+    public Material getMaterial() {
+        return Materials.BASIC;
     }
 }

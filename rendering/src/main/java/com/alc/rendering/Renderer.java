@@ -15,12 +15,12 @@ import java.util.List;
 import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL32.*;
+import static org.lwjgl.opengl.GL32.glFramebufferTexture;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
@@ -40,8 +40,10 @@ public class Renderer {
     private int height;
     private String title;
     private final AbstractCamera camera;
-    private Light light = new Light(new Vector3f(5, 5, 5), new Vector3f(1, 1, 1), new Vector3f(0.5f, 0.03f, 0.01f));
+    private List<Light> lights;
     private AmbientLight ambient = new AmbientLight(new Vector3f(0.1f, 0.1f, 0.1f));
+    private final String texturesPath;
+    private final String modelsPath;
 
     private Matrix4f scaleBiasMatrix = new Matrix4f(
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -49,7 +51,7 @@ public class Renderer {
             0.0f, 0.0f, 0.5f, 0.0f,
             0.5f, 0.5f, 0.5f, 1.0f
     );
-    Model hoodModel = new Model(
+    private Model hoodModel = new Model(
             new Vertex[]{
                     new Vertex(new Vector3f(-1, -1, 0), new Vector2f(0, 0), new Vector3f(0, 0, 1)),
                     new Vertex(new Vector3f(-1, -0.5f, 0), new Vector2f(0, 1), new Vector3f(0, 0, 1)),
@@ -60,12 +62,16 @@ public class Renderer {
                     2, 1, 0, 0, 3, 2
             }
     );
-    int depthTextureSize = 512;
-    int colorTextureID;
-    int framebufferID;
-    int depthRenderBufferID;
+    private int depthTextureSize = 1024;
+    private int depthTextureId;
+    private int framebufferID;
 
-    public Renderer(GLFWKeyCallback keyCallback, GLFWCursorPosCallback mouseMotionCallback, GLFWScrollCallback scrollCallback, int width, int height, String title, AbstractCamera camera) {
+    private int depthTextureSlot = 0;
+    private int colorTextureSlot = 1;
+
+    private Vector2f nearFarPlanes = new Vector2f(1, 100);
+
+    public Renderer(GLFWKeyCallback keyCallback, GLFWCursorPosCallback mouseMotionCallback, GLFWScrollCallback scrollCallback, int width, int height, String title, AbstractCamera camera, String texturesPath, String modelsPath) {
 
         this.keyCallback = keyCallback;
         this.mouseMotionCallback = mouseMotionCallback;
@@ -75,7 +81,10 @@ public class Renderer {
         this.title = title;
         this.camera = camera;
         this.objects = new ArrayList<>();
+        this.lights = new ArrayList<>();
         this.cache = new Cache();
+        this.texturesPath = texturesPath;
+        this.modelsPath = modelsPath;
     }
 
     public void run() {
@@ -169,20 +178,11 @@ public class Renderer {
     }
 
     private void draw() {
-        light.getPosition().rotate(new Quaternionf().rotationY(0.001f));
-        Matrix4f viewProjectionMatrix = new Matrix4f()
-                .setPerspective((float) Math.toRadians(45), width / height, 0.01f, 100)
-                .lookAt(
-                        camera.getEye(),
-                        camera.getCenter(),
-                        camera.getUp()
-                );
 
         Matrix4f lightViewProjectionMatrix = new Matrix4f()
-                .setPerspective((float) Math.toRadians(45), width / height, 1.0f, 20)
-//                .setOrtho(-1, 1, -1, 1, 1.0f, 10)
+                .setPerspective((float) Math.toRadians(45), width / height, nearFarPlanes.x, nearFarPlanes.y)
                 .lookAt(
-                        light.getPosition(),
+                        lights.get(0).getPosition(),
                         new Vector3f(0, 0, 0),
                         new Vector3f(0, 1, 0)
                 );
@@ -193,23 +193,31 @@ public class Renderer {
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
         shader.useShadow();
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0 + depthTextureSlot);
         glBindTexture(GL_TEXTURE_2D, 0);
-        glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE0 + colorTextureSlot);
         glBindTexture(GL_TEXTURE_2D, 0);
         glViewport(0, 0, depthTextureSize, depthTextureSize);
         glClearDepth(1.0f);
-        glClear(GL_DEPTH_BUFFER_BIT);
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(2.0f, 4.0f);
+        glClear(GL_DEPTH_BUFFER_BIT);
         for (RendererObject object : objects) {
             Matrix4f modelMatrix = new Matrix4f()
-                    .translationRotateScale(object.getPosition(), object.getDirection(), object.getScale());
+                    .translationRotateScale(object.getPosition(), new Quaternionf()/*object.getDirection()*/, object.getScale());
             Matrix4f MVP = new Matrix4f(lightViewProjectionMatrix).mul(modelMatrix);
             shader.setUniform("mvps", MVP);
-//            cache.getTextures().get(object.getTextureId()).use();
             cache.getModels().get(object.getModelId()).draw();
         }
+
+
+        Matrix4f viewProjectionMatrix = new Matrix4f()
+                .setPerspective((float) Math.toRadians(45), width / height, 0.01f, 100)
+                .lookAt(
+                        camera.getEye(),
+                        camera.getCenter(),
+                        camera.getUp()
+                );
         glDisable(GL_POLYGON_OFFSET_FILL);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDrawBuffer(GL_BACK);
@@ -219,22 +227,25 @@ public class Renderer {
         clear();
         shader.use();
         shader.setUniform("ambient", ambient.getColor());
-        shader.setUniform("lightP", light.getPosition());
-        shader.setUniform("lightC", light.getColor());
-        shader.setUniform("lightA", light.getAttenuation());
+        shader.setUniform("lightP", lights.get(0).getPosition());
+        shader.setUniform("lightC", lights.get(0).getColor());
+        shader.setUniform("lightA", lights.get(0).getAttenuation());
         shader.setUniform("eye", camera.getEye());
         shader.setUniform("shadow_matrix", shadowMatrix);
-        shader.setUniform("depth_texture", 0);
-        shader.setUniform("tex", 1);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, colorTextureID);
-        glActiveTexture(GL_TEXTURE1);
+        shader.setUniform("depth_texture", depthTextureSlot);
+        shader.setUniform("tex", colorTextureSlot);
+
+        glActiveTexture(GL_TEXTURE0 + depthTextureSlot);
+        glBindTexture(GL_TEXTURE_2D, depthTextureId);
+        glActiveTexture(GL_TEXTURE0 + colorTextureSlot);
         for (RendererObject object : objects) {
             Matrix4f modelMatrix = new Matrix4f()
-                    .translationRotateScale(object.getPosition(), object.getDirection(), object.getScale());
+                    .translationRotateScale(object.getPosition(), new Quaternionf()/*object.getDirection()*/, object.getScale());
             Matrix4f MVP = new Matrix4f(viewProjectionMatrix).mul(modelMatrix);
             shader.setUniform("mvp", MVP);
             shader.setUniform("model", modelMatrix);
+            shader.setUniform("shine", object.getMaterial().getShine());
+            shader.setUniform("coloring", object.getMaterial().getColor());
             cache.getTextures().get(object.getTextureId()).use();
             cache.getModels().get(object.getModelId()).draw();
         }
@@ -243,8 +254,7 @@ public class Renderer {
         Matrix4f viewOrthoMatrix = new Matrix4f()
                 .setOrtho(-1, 1, -1, 1, -1, 1);
         shader.setUniform("mvpt", viewOrthoMatrix);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, colorTextureID);
+        glBindTexture(GL_TEXTURE_2D, depthTextureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
         hoodModel.draw();
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
@@ -274,25 +284,11 @@ public class Renderer {
 
         this.shader = new Shader();
 
-//        cubeTextureID = glGenTextures();                                               // and a new texture used as a color buffer
-//
-//        // initialize color texture
-//        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTextureID);                                   // Bind the colorbuffer texture
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_INT, (java.nio.ByteBuffer) null);  // Create the texture data
-//        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_INT, (java.nio.ByteBuffer) null);  // Create the texture data
-//        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_INT, (java.nio.ByteBuffer) null);  // Create the texture data
-//        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_INT, (java.nio.ByteBuffer) null);  // Create the texture data
-//        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_INT, (java.nio.ByteBuffer) null);  // Create the texture data
-//        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_INT, (java.nio.ByteBuffer) null);  // Create the texture data
-//
-//        framebufferID = glGenFramebuffersEXT();                                         // create a new framebuffer
-//        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebufferID);                        // switch to the new framebuffer
-//        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, cubeTextureID, 0); // attach it to the framebuffer
+        framebufferID = glGenFramebuffers();                                         // create a new framebuffer
+
+//        framebufferID = glGenFramebuffers();                                         // create a new framebuffer
+//        glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);                        // switch to the new framebuffer
+//        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0); // attach it to the framebuffer
 //
 //        depthRenderBufferID = glGenRenderbuffersEXT();                                  // And finally a new depthbuffer
 //
@@ -303,12 +299,11 @@ public class Renderer {
 //
 //        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-        framebufferID = glGenFramebuffers();                                         // create a new framebuffer
-        colorTextureID = glGenTextures();                                               // and a new texture used as a color buffer
-//        depthRenderBufferID = glGenRenderbuffers();                                  // And finally a new depthbuffer
+
+        depthTextureId = glGenTextures();                                               // and a new texture used as a color buffer
 
         // initialize color texture
-        glBindTexture(GL_TEXTURE_2D, colorTextureID);                                   // Bind the colorbuffer texture
+        glBindTexture(GL_TEXTURE_2D, depthTextureId);                                   // Bind the colorbuffer texture
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, depthTextureSize, depthTextureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (java.nio.ByteBuffer) null);  // Create the texture data
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);               // make it linear filterd
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);               // make it linear filterd
@@ -319,7 +314,29 @@ public class Renderer {
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);                        // switch to the new framebuffer
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, colorTextureID, 0); // attach it to the framebuffer
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTextureId, 0); // attach it to the framebuffer
+
+        // initialize color texture
+//        glBindTexture(GL_TEXTURE_CUBE_MAP, depthTextureId);                                   // Bind the colorbuffer texture
+//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+////        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//        for (int i = 0; i < 6; i++) {
+//            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32, depthTextureSize, depthTextureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (java.nio.ByteBuffer) null);
+//        }
+//        glBindTexture(GL_TEXTURE_2D, 0);
+//
+//        glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);                        // switch to the new framebuffer
+//        for (int i = 0; i < 6; i++) {
+////            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTextureId, 0, i); // attach it to the framebuffer
+////            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, depthTextureId, 0);
+//        }
+
 
         // initialize depth renderbuffer
 //        glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBufferID);                // bind the depth renderbuffer
@@ -343,11 +360,19 @@ public class Renderer {
         this.objects = objects;
         for (RendererObject object : objects) {
             if (!cache.getModels().containsKey(object.getModelId())) {
-                cache.getModels().put(object.getModelId(), ResourceLoader.loadModel(object.getModelId()));
+                cache.getModels().put(object.getModelId(), ResourceLoader.loadModel(modelsPath, object.getModelId()));
             }
             if (!cache.getTextures().containsKey(object.getTextureId())) {
-                cache.getTextures().put(object.getTextureId(), ResourceLoader.loadTexture(object.getTextureId()));
+                cache.getTextures().put(object.getTextureId(), ResourceLoader.loadTexture(texturesPath, object.getTextureId()));
             }
         }
+    }
+
+    public List<Light> getLights() {
+        return lights;
+    }
+
+    public void setLights(List<Light> lights) {
+        this.lights = lights;
     }
 }

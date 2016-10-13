@@ -1,6 +1,7 @@
 package com.alc.rendering;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
@@ -19,7 +20,9 @@ import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
  */
 public class Shader {
     private int program;
+    private int program2;
     private int shadowProgram;
+    private int shadowProgram2;
     private int shadowTestProgram;
     private Map<String, Integer> uniforms;
 
@@ -42,6 +45,8 @@ public class Shader {
         addUniform("tex", program);
         addUniform("depth_texture", program);
         addUniform("shadow_matrix", program);
+        addUniform("coloring", program);
+        addUniform("shine", program);
 
         shadowProgram = glCreateProgram();
         addVertexShader(loadShader("shadow.vert"), shadowProgram);
@@ -56,7 +61,28 @@ public class Shader {
         compileShader(shadowTestProgram);
 
         addUniform("mvpt", shadowTestProgram);
+    /////////////////
+        program2 = glCreateProgram();
+        addVertexShader(loadShader("basic2.vert"), program2);
+        addFragmentShader(loadShader("basic2.frag"), program2);
+        compileShader(program2);
 
+        addUniform("u_shadowCubeMap", program2);
+        addUniform("u_lightPos", program2);
+        addUniform("u_nearFarPlane", program2);
+        addUniform("u_modelMat", program2);
+        addUniform("u_modelViewProjMat", program2);
+
+        shadowProgram2 = glCreateProgram();
+        addVertexShader(loadShader("shadow2.vert"), shadowProgram2);
+        addFragmentShader(loadShader("shadow2.frag"), shadowProgram2);
+        compileShader(shadowProgram2);
+
+        addUniform("u_modelMat", shadowProgram2);
+        addUniform("u_modelViewProjMat", shadowProgram2);
+        addUniform("u_lightPos", shadowProgram2);
+        addUniform("u_nearFarPlane", shadowProgram2);
+        addUniform("u_depthOffset", shadowProgram2);
     }
 
     private void AddProgram(String text, int type, int program) {
@@ -143,6 +169,10 @@ public class Shader {
         glUniform1i(uniforms.get(name), value);
     }
 
+    public void setUniform(String name, Vector2f value) {
+        glUniform2f(uniforms.get(name), value.x, value.y);
+    }
+
     public void setUniform(String name, Vector3f value) {
         glUniform3f(uniforms.get(name), value.x, value.y, value.z);
     }
@@ -159,8 +189,16 @@ public class Shader {
         glUseProgram(program);
     }
 
+    public void use2() {
+        glUseProgram(program2);
+    }
+
     public void useShadow() {
         glUseProgram(shadowProgram);
+    }
+
+    public void useShadow2() {
+        glUseProgram(shadowProgram2);
     }
 
     public void useShadowTest() {

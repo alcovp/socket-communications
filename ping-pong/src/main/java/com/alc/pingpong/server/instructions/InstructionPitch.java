@@ -22,7 +22,7 @@ public class InstructionPitch implements IInstruction<ServerData> {
     public void execute(ServerData data) {
         Client client = data.findClientById(clientId);
         if (client != null) {
-            if (data.isGameStarted() && client.getPlayer().isPitching() && data.getBall().getVelocity().length() == 0) {
+            if (/*data.isGameStarted() && */client.getPlayer().isPitching() && data.getBall().getVelocity().length() == 0) {
                 Vector3f velocity;
                 if (client.getPlayer().isNear()) {
                     velocity = new Vector3f(0, 0, 1).mul(data.getBall().getInitialSpeed());

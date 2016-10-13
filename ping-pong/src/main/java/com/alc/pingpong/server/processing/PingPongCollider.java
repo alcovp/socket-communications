@@ -3,6 +3,7 @@ package com.alc.pingpong.server.processing;
 import com.alc.physics.AABB;
 import com.alc.physics.Collider;
 import com.alc.pingpong.server.data.ServerData;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
@@ -30,19 +31,25 @@ public class PingPongCollider {
         }
 
         if (Collider.collide(data.getPlayerNear().getBounds(), ballBounds)) {
+            float dividedXDelta = (data.getPlayerNear().getPosition().x - data.getBall().getPosition().x) / 1.5f;
             data.getBall().setVelocity(
                     new Vector3f(data.getBall().getPosition())
                             .sub(data.getPlayerNear().getPosition())
+                            .add(dividedXDelta, 0, 0)
                             .normalize()
                             .mul(data.getBall().getInitialSpeed())
             );
         } else if (Collider.collide(data.getPlayerFar().getBounds(), ballBounds)) {
+            float dividedXDelta = (data.getPlayerFar().getPosition().x - data.getBall().getPosition().x) / 1.5f;
             data.getBall().setVelocity(
                     new Vector3f(data.getBall().getPosition())
                             .sub(data.getPlayerFar().getPosition())
+                            .add(dividedXDelta, 0, 0)
                             .normalize()
                             .mul(data.getBall().getInitialSpeed())
             );
         }
+        Vector3f velocity = new Vector3f(data.getBall().getVelocity()).normalize();
+        data.getBall().setDirection(new Quaternionf(velocity.x, velocity.y, velocity.z));
     }
 }

@@ -1,6 +1,7 @@
 package com.alc.pingpong;
 
 import com.alc.physics.AABB;
+import com.alc.rendering.Material;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -10,8 +11,9 @@ import java.util.UUID;
 /**
  * Created by alc on 03.10.2015.
  */
-public class Player implements Serializable, IHasModel, IHasTexture {
+public class Player implements Serializable, IHasModel, IHasTexture, IHasMaterial {
 
+    private Material material;
     private String modelId = ResourcesIds.PLAYER_MODEL;
     private String textureId = ResourcesIds.PLAYER_TEXTURE;
     private final UUID id;
@@ -27,7 +29,8 @@ public class Player implements Serializable, IHasModel, IHasTexture {
     private float speed;
     private int score;
 
-    public Player(Vector3f size, boolean near, float speed) {
+    public Player(Material material, Vector3f size, boolean near, float speed) {
+        this.material = material;
         this.size = size;
         this.near = near;
         this.id = UUID.randomUUID();
@@ -154,5 +157,14 @@ public class Player implements Serializable, IHasModel, IHasTexture {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    @Override
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 }

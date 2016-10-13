@@ -73,4 +73,9 @@ public class InstructionManager extends AbstractInstructionManager {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void disconnectClient(AbstractClient client) {
+
+    }
 }

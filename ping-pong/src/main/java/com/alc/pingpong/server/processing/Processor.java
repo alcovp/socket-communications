@@ -36,19 +36,17 @@ public class Processor extends AbstractProcessor {
         lastTick = newTickTime;
 
         serverData.getClients().stream().forEach(client -> {
-            if (serverData.isGameStarted()) {
-                Vector3f distance = new Vector3f();
-                if (client.getPlayer().isMovingRight()) {
-                    distance.add(client.getPlayer().getSpeed() * (float) tickSeconds, 0, 0);
-                }
-                if (client.getPlayer().isMovingLeft()) {
-                    distance.sub(client.getPlayer().getSpeed() * (float) tickSeconds, 0, 0);
-                }
-
-                distance = Collider.getRedirectedDistance(serverData.getWorld().getBounds(), client.getPlayer().getSize(), client.getPlayer().getPosition(), distance);
-
-                client.getPlayer().getPosition().add(distance);
+            Vector3f distance = new Vector3f();
+            if (client.getPlayer().isMovingRight()) {
+                distance.add(client.getPlayer().getSpeed() * (float) tickSeconds, 0, 0);
             }
+            if (client.getPlayer().isMovingLeft()) {
+                distance.sub(client.getPlayer().getSpeed() * (float) tickSeconds, 0, 0);
+            }
+
+            distance = Collider.getRedirectedDistance(serverData.getWorld().getBounds(), client.getPlayer().getSize(), client.getPlayer().getPosition(), distance);
+
+            client.getPlayer().getPosition().add(distance);
         });
 
         Vector3f distance = new Vector3f(serverData.getBall().getVelocity()).mul((float) tickSeconds);

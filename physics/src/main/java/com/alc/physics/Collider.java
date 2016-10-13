@@ -34,7 +34,7 @@ public class Collider {
     }
 
     public static Vector3f getRedirectedDistance(final AABB target, final Vector3f size, final Vector3f startPoint, final Vector3f distance) {
-        Vector3f endPoint = startPoint.add(distance);
+        Vector3f endPoint = new Vector3f(startPoint).add(distance);
         Vector3f redirectedDistance = new Vector3f(distance);
         if (endPoint.x - size.x / 2 < target.x1) {
             redirectedDistance.add(target.x1 - (endPoint.x - size.x / 2), 0, 0);

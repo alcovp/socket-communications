@@ -1,6 +1,7 @@
 package com.alc.pingpong;
 
 import com.alc.physics.AABB;
+import com.alc.rendering.Material;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -9,8 +10,9 @@ import java.io.Serializable;
 /**
  * Created by alc on 03.10.2015.
  */
-public class Ball implements Serializable, IHasModel, IHasTexture {
+public class Ball implements Serializable, IHasModel, IHasTexture, IHasMaterial {
 
+    private Material material;
     private String modelId = ResourcesIds.BALL_MODEL;
     private String textureId = ResourcesIds.BALL_TEXTURE;
     private Vector3f position;
@@ -20,7 +22,8 @@ public class Ball implements Serializable, IHasModel, IHasTexture {
     private Vector3f size;
     private float initialSpeed;
 
-    public Ball(Vector3f size, float initialSpeed) {
+    public Ball(Material material, Vector3f size, float initialSpeed) {
+        this.material = material;
         this.size = size;
         this.initialSpeed = initialSpeed;
         this.position = new Vector3f();
@@ -104,5 +107,14 @@ public class Ball implements Serializable, IHasModel, IHasTexture {
 
     public void setModelId(String modelId) {
         this.modelId = modelId;
+    }
+
+    @Override
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 }

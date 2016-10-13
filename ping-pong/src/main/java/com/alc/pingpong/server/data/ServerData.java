@@ -4,6 +4,8 @@ import com.alc.physics.AABB;
 import com.alc.pingpong.Ball;
 import com.alc.pingpong.Player;
 import com.alc.pingpong.World;
+import com.alc.rendering.Material;
+import com.alc.rendering.Materials;
 import com.alc.socket.server.Data.AbstractClient;
 import com.alc.socket.server.Data.AbstractServerData;
 import org.joml.Vector3f;
@@ -23,9 +25,19 @@ public class ServerData extends AbstractServerData<Client> {
     private Player playerFar;
 
     public ServerData() {
-        this.ball = new Ball(new Vector3f(0.5f, 0.5f, 0.5f), 20);
-        this.playerNear = new Player(new Vector3f(1.5f, 0.5f, 0.5f), true, 10f);
-        this.playerFar = new Player(new Vector3f(1.5f, 0.5f, 0.5f), false, 10f);
+        this.ball = new Ball(Materials.GLOSS, new Vector3f(1.0f, 1.0f, 1.0f), 8);
+        this.playerNear = new Player(
+                new Material(1, new Vector3f(1.0f, 0.0f, 0.0f)),
+                new Vector3f(3.0f, 1.0f, 1.0f),
+                true,
+                20f
+        );
+        this.playerFar = new Player(
+                new Material(1, new Vector3f(0.0f, 1.0f, 0.0f)),
+                new Vector3f(19.0f, 1.0f, 1.0f),
+                false,
+                20f
+        );
         this.world = new World(new AABB(-10, 10, -10, 10, -10, 10));
 
         restoreInitialData();

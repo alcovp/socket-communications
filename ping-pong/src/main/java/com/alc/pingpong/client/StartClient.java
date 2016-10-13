@@ -1,12 +1,16 @@
 package com.alc.pingpong.client;
 
+import com.alc.rendering.Light;
 import com.alc.rendering.Renderer;
 import com.alc.socket.client.Client;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by alc on 03.10.2015.
@@ -33,7 +37,7 @@ public class StartClient {
             public void invoke(long window, double xoffset, double yoffset) {
                 inputProcessor.processScroll(new ScrollEvent(xoffset, yoffset));
             }
-        }, 600, 600, "ping pong", data.getCamera());
+        }, 600, 600, "ping pong", data.getCamera(), "src/main/resources/texture/", "src/main/resources/model/");
 
         Client client = new Client() {
             @Override
@@ -45,7 +49,8 @@ public class StartClient {
             @Override
             protected void scanMessage(Object message) {
                 dispenser.pushServerResponse(message);
-                renderer.setObjects(RenderingObjectsBuilder.buildFromClientData(data));
+                renderer.setObjects(RenderingObjectsBuilder.buildObjectsFromClientData(data));
+                renderer.setLights(RenderingObjectsBuilder.buildLightsFromClientData(data));
             }
         };
         client.start();
